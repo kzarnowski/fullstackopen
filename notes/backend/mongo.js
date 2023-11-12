@@ -30,9 +30,9 @@ const Note = mongoose.model('Note', noteSchema)
 //   mongoose.connection.close()
 // })
 
-Note.find({important: true}).then(result => {
-    result.forEach(note => {
-      console.log(note)
-    })
-    mongoose.connection.close()
+Note.find({ important: true }).then(result => {
+  result.forEach(note => {
+    console.log(note)
   })
+  mongoose.connection.close()
+})

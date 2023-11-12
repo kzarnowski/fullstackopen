@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { addPerson, updatePerson } from '../services/persons'
 
-export default function PersonForm({persons, setPersons}) {
+export default function PersonForm({persons, setPersons, setError}) {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
 
@@ -20,10 +20,10 @@ export default function PersonForm({persons, setPersons}) {
     if (!newName || !newNumber) {
       return
     }
-    if (persons.find(p => p.number === newNumber)) {
-      alert('Number already exists')
-      return
-    }
+    // if (persons.find(p => p.number === newNumber)) {
+    //   alert('Number already exists')
+    //   return
+    // }
     const newPerson = { name: newName, number: newNumber }
     const p = persons.find(p => p.name === newName)
     if (p) {
@@ -46,7 +46,11 @@ export default function PersonForm({persons, setPersons}) {
         setNewName('')
         setNewNumber('')
       })
-      .catch((err) => console.log(err))
+      .catch((err) => {
+        console.log(err)
+        setError(err.response.data.error)
+        setTimeout(() => setError(''), 3000)
+      })
   }
 
   return (

@@ -9,7 +9,7 @@ app.use(express.json())
 app.use(express.static('dist'))
 app.use(cors())
 
-morgan.token('body', function (req, res) { return JSON.stringify(req.body) })
+morgan.token('body', function (req) { return JSON.stringify(req.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
 app.get('/api/persons', (req, res, next) => {
@@ -32,12 +32,16 @@ app.delete('/api/persons/:id', (req, res, next) => {
 
 app.post('/api/persons', (req, res, next) => {
   if (!req.body.name || !req.body.number) {
-    return res.status(400).json({erorr: 'Name or number missing'})
+    return res.status(400).json({ erorr: 'Name or number missing' })
+  }
+  if (req.body.name.length < 3) {
+    return res.status(400).json({ error: `Name ${req.body.name} to short. Min 3 characters.` })
   }
   Person.find({})
     .then((persons) => {
+      // eslint-disable-next-line eqeqeq
       if (persons.find(p => p.number == req.body.number)) {
-        return res.status(400).json({error: 'Number already exists'})
+        return res.status(400).json({ error: 'Number already exists' })
       }
       const existingPerson = persons.find(p => p.name === req.body.name)
       if (existingPerson) {
@@ -47,7 +51,7 @@ app.post('/api/persons', (req, res, next) => {
           name: req.body.name,
           number: req.body.number
         }
-        Person.findByIdAndUpdate(existingPerson.id, person, {new: true})
+        Person.findByIdAndUpdate(existingPerson.id, person, { new: true })
           .then(updatedPerson => {
             res.status(200).json(updatedPerson).end()
           })
@@ -67,10 +71,37 @@ app.post('/api/persons', (req, res, next) => {
     .catch(err => next(err))
 })
 
+app.put('/api/persons/:id', (req, res, next) => {
+  if (!req.body.name || !req.body.number) {
+    return res.status(400).json({ erorr: 'Name or number missing' })
+  }
+  if (req.body.name.length < 3) {
+    return res.status(400).json({ error: `Name ${req.body.name} to short. Min 3 characters.` })
+  }
+  const person = {
+    name: req.body.name,
+    number: req.body.number
+  }
+  Person.find({})
+    .then((persons) => {
+      // eslint-disable-next-line eqeqeq
+      if (persons.find(p => p.number == req.body.number)) {
+        return res.status(400).json({ error: 'Number already exists' })
+      }
+    })
+    .catch(err => next(err))
+
+  Person.findByIdAndUpdate(req.params.id, person, { new: true })
+    .then(updatedPerson => {
+      res.status(200).json(updatedPerson).end()
+    })
+    .catch(err => next(err))
+})
+
 const errorHandler = (error, request, response, next) => {
   console.log(error.message)
-  if (error.name == 'CastError') {
-    return response.status(400).send({error: 'malformed ID'})
+  if (error.name === 'CastError') {
+    return response.status(400).send({ error: 'malformed ID' })
   }
   next(error)
 }
