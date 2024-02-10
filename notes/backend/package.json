@@ -11,7 +11,8 @@
     "deploy": "fly deploy",
     "deploy:full": "npm run build:ui && npm run deploy",
     "logs:prod": "fly logs",
-    "lint": "eslint --fix --ext .js,.jsx ."
+    "lint": "eslint --fix --ext .js,.jsx .",
+    "test": "jest --verbose"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +25,10 @@
   "devDependencies": {
     "@flydotio/dockerfile": "^0.4.10",
     "eslint": "^8.53.0",
+    "jest": "^29.7.0",
     "nodemon": "^2.0.20"
+  },
+  "jest": {
+    "testEnvironment": "node"
   }
 }
