@@ -1,11 +1,7 @@
 const mongoose = require('mongoose')
 
-const noteSchema = new mongoose.Schema({
-  content: {
-    type: String,
-    minlength: 5,
-    required: true
-  },
+const noteSchema = mongoose.Schema({
+  content: String,
   important: Boolean,
 })
 
